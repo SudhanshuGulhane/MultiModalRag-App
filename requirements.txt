@@ -1,0 +1,7 @@
+python-magic-bin
+unstructured[all-docs]
+pdf2image
+pillow
+pandas
+pypdf
+chromadb
