@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MultiModal ChatBot</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h2>📄 Upload PDF + 💬 Chat</h2>
+
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" id="fileInput" required />
+    <button type="submit">Upload</button>
+  </form>
+
+  <div id="fileLoader" style="display:none; margin-top:10px;">📄 Processing File...</div>
+
+  <div id="chatBox" style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:auto; margin-top:20px;"></div>
+
+  <div id="loader" style="display:none; margin-top:10px;">🤖 Thinking...</div>
+
+  <form id="chatForm">
+    <input type="text" id="userInput" placeholder="Ask a question..." required />
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    let uploadedFilename = "";
+  
+    // Upload File
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const file = document.getElementById("fileInput").files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const fileLoader = document.getElementById("fileLoader");
+      fileLoader.style.display = "block";
+  
+      try {
+      const res = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      uploadedFilename = data.filename;
+        alert("File uploaded successfully!");
+      } catch (err) {
+        alert("Error uploading file.");
+      } finally {
+        fileLoader.style.display = "none";
+      }
+    });
+  
+    // Handle Chat
+    document.getElementById("chatForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = document.getElementById("userInput").value;
+      if (!uploadedFilename) {
+        alert("Please upload a file first!");
+        return;
+      }
+  
+      const chatBox = document.getElementById("chatBox");
+      const loader = document.getElementById("loader");
+  
+      chatBox.innerHTML += `<p><b>You:</b> ${input}</p>`;
+      loader.style.display = "block";  // Show spinner
+  
+      try {
+        const res = await fetch("/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: input, filename: uploadedFilename }),
+        });
+  
+        const data = await res.json();
+        chatBox.innerHTML += `<p><b>Bot:</b> ${data.response}</p>`;
+      } catch (err) {
+        chatBox.innerHTML += `<p><b>Bot:</b> Error occurred!</p>`;
+      } finally {
+        loader.style.display = "none";  // Hide spinner
+        chatBox.scrollTop = chatBox.scrollHeight;
+        document.getElementById("userInput").value = "";
+      }
+    });
+  </script>
+  
+</body>
+</html>

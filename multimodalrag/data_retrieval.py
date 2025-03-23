@@ -11,6 +11,8 @@ from langchain_openai import ChatOpenAI
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
+from multimodalrag.config import openai_key
+
 def plt_img_base64(img_base64):
     image_html = f'<img src="data:image/jpeg;base64,{img_base64}" />' # create a html tag to display the image by taking the base 64 encoded image as input
     display(HTML(image_html))
@@ -94,7 +96,7 @@ def rag_chain_for_multi_modal(retriever):
             "question": RunnablePassthrough(),
         }
         | RunnableLambda(custom_prompt)
-        | ChatOpenAI(model="gpt-4o-mini")
+        | ChatOpenAI(model="gpt-4o-mini", api_key=openai_key)
         | StrOutputParser()
     )
 
@@ -106,7 +108,7 @@ def rag_chain_for_multi_modal_with_sources(retriever):
             "question": RunnablePassthrough(),
         } | RunnablePassthrough().assign(
             response = (RunnableLambda(custom_prompt)
-            | ChatOpenAI(model="gpt-4o-mini")
+            | ChatOpenAI(model="gpt-4o-mini", api_key=openai_key)
             | StrOutputParser()
         )
     )

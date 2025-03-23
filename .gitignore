@@ -2,3 +2,5 @@ multimodal
 chroma_db
 *.pdf
 *.ipynb
+.env
+__pycache__

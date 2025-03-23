@@ -37,9 +37,9 @@ def create_multi_vector_retriever(
     
     return retriever
 
-def create_multimodal_retriever(text_summaries, texts, table_summaries, tables, image_summaries, images):
+def create_multimodal_retriever(file_name, text_summaries, texts, table_summaries, tables, image_summaries, images):
     vectorstore = Chroma(
-        collection_name="multimodalvectorstore", embedding_function=OpenAIEmbeddings()
+        collection_name=f"multimodalvectorstore_{file_name}", embedding_function=OpenAIEmbeddings()
     )
 
     multimodal_retriever = create_multi_vector_retriever(

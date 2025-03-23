@@ -2,6 +2,7 @@ from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_openai import ChatOpenAI
+from multimodalrag.config import openai_key, groq_key
 
 def summarize_tables(tables):
     prompt_text = """
@@ -15,7 +16,7 @@ def summarize_tables(tables):
     """
     prompt = ChatPromptTemplate.from_template(prompt_text)
 
-    model = ChatGroq(temperature=0.5, model="llama-3.1-8b-instant")
+    model = ChatGroq(temperature=0.5, model="llama-3.1-8b-instant", api_key=groq_key)
 
     summarize_chain = {"element": lambda x: x} | prompt | model | StrOutputParser()
 
@@ -41,7 +42,7 @@ def summarize_images(images):
 
     prompt = ChatPromptTemplate.from_messages(messages)
 
-    chain = prompt | ChatOpenAI(model="gpt-4o-mini") | StrOutputParser()
+    chain = prompt | ChatOpenAI(model="gpt-4o-mini", api_key=openai_key) | StrOutputParser()
 
     image_summaries = chain.batch(images)
 
@@ -57,7 +58,7 @@ def summarize_text(texts):
     """
     prompt = ChatPromptTemplate.from_template(prompt_text)
     
-    summarize_chain = {"element": lambda x: x} | prompt | ChatOpenAI(model="gpt-4o-mini") | StrOutputParser()
+    summarize_chain = {"element": lambda x: x} | prompt | ChatOpenAI(model="gpt-4o-mini", api_key=openai_key) | StrOutputParser()
 
     text_summaries = summarize_chain.batch(texts, {"max_concurrency": 3})
 
